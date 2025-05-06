@@ -1,0 +1,7 @@
+# Oculta arquivos locais e sensíveis
+.env
+.env.*
+__pycache__/
+*.pyc
+*.json
+.DS_Store
