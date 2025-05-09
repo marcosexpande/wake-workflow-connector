@@ -9,6 +9,8 @@ load_dotenv()
 LIST_ID = os.getenv("LIST_ID")
 WORKFLOW_EVENT = os.getenv("WORKFLOW_EVENT")
 
+print("[DEBUG] LIST_ID carregado do .env:", os.getenv("LIST_ID"))
+
 def main():
     # Autenticação das duas APIs
     segment_token = get_segment_token()

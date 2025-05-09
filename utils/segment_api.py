@@ -1,36 +1,48 @@
+
 import os
 import requests
 import json
 from datetime import datetime, timedelta
 
-# Caminho local para armazenar o token gerado
 TOKEN_FILE = "segment_token.json"
 
-# Função para verificar se o token armazenado ainda é válido
 def is_token_valid(token_data):
     expires_at = datetime.fromisoformat(token_data["expires_at"])
     return datetime.utcnow() < expires_at
 
-# Geração ou reutilização do token com cache
-def get_segment_token():
-    # Verifica se já existe token salvo localmente
+def load_cached_token():
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE, "r") as f:
-            token_data = json.load(f)
-            if is_token_valid(token_data):
-                return token_data["access_token"]
+            try:
+                token_data = json.load(f)
+                if is_token_valid(token_data):
+                    return token_data["access_token"]
+            except Exception:
+                return None
+    return None
 
-    # Se não existir ou estiver expirado, gera novo token
+def get_segment_token():
+    cached_token = load_cached_token()
+    if cached_token:
+        return cached_token
+
+    username = os.getenv("SEGMENT_USERNAME")
+    password = os.getenv("SEGMENT_PASSWORD")
+
     url = "https://painel02.allinmail.com.br/allinapi/?method=get_token"
-    payload = {
-        "username": os.getenv("SEGMENT_USERNAME"),
-        "password": os.getenv("SEGMENT_PASSWORD")
+    headers = {
+        "accept": "application/json",
+        "content-type": "application/x-www-form-urlencoded"
     }
-    response = requests.post(url, json=payload)
-    response.raise_for_status()
-    access_token = response.json()["access_token"]
+    data = {
+        "username": username,
+        "password": password
+    }
 
-    # Salva token com tempo de expiração (12h - margem de 30min)
+    response = requests.post(url, headers=headers, data=data)
+    response.raise_for_status()
+    access_token = response.json()["token"]
+
     token_data = {
         "access_token": access_token,
         "expires_at": (datetime.utcnow() + timedelta(hours=11, minutes=30)).isoformat()
@@ -41,13 +53,12 @@ def get_segment_token():
 
     return access_token
 
-# Busca lista de usuários com base no ID
 def get_list_users(token, list_id, limit=100):
     all_users = []
-    offset = 0
+    page = 1
 
     while True:
-        url = f"https://segments-xp.wake.tech/v1/lists/{list_id}?limit={limit}&offset={offset}"
+        url = f"https://segments-xp.wake.tech/v1/lists/{list_id}?limit={limit}&page={page}"
         headers = {
             "Authorization": f"Bearer {token}",
             "Content-Type": "application/json"
@@ -61,6 +72,6 @@ def get_list_users(token, list_id, limit=100):
             break
 
         all_users.extend(result)
-        offset += limit
+        page += 1
 
     return all_users
