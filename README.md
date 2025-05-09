@@ -74,7 +74,7 @@ LIST_ID=ID_lista/segmentação
   - Autenticar
   - Ler usuários da lista
   - Acionar evento de workflow
-- Compatível com orquestração (Airflow)
+- Paginação automática implementada: carrega todos os usuários da lista mesmo quando há mais de 100 registros (API usa limit/page)
 
 ## 📤 Próximos passos
 
