@@ -58,11 +58,13 @@ python3 main.py
 ## 🌐 Variáveis de Ambiente (.env)
 
 ```env
-SEGMENT_USERNAME=seu_usuario
-SEGMENT_PASSWORD=sua_senha
-WORKFLOW_USERNAME=seu_usuario_workflow
-WORKFLOW_PASSWORD=sua_senha_workflow
-LIST_ID=1234567
+SEGMENT_USERNAME=login_API_Marketing
+SEGMENT_PASSWORD=senha_API_Marketing
+
+WORKFLOW_USERNAME=login_API_Transacional
+WORKFLOW_PASSWORD=senha_API_Transacional
+
+LIST_ID=ID_lista/segmentação
 ```
 
 ## 🧠 Comportamento inteligente
